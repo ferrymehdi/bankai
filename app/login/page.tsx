@@ -1,22 +1,34 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { SignIn, SignUp, useUser } from "@clerk/nextjs";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
+export const dynamic = "force-dynamic";
+
 export default function LoginPage() {
-  const searchParams = useSearchParams();
-  const type = searchParams.get("t") || "signin";
-  const { user, isLoaded } = useUser();
   const router = useRouter();
-  const { resolvedTheme } = useTheme();
+  const { user, isLoaded } = useUser();
 
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [type, setType] = useState<"signin" | "signup">("signin");
+
+  useEffect(() => {
+    setMounted(true);
+    const updateTypeFromUrl = () => {
+      const params = new URLSearchParams(window.location.search);
+      const t = params.get("t");
+      if (t === "signup") setType("signup");
+      else setType("signin");
+    };
+
+    updateTypeFromUrl();
+
+    window.addEventListener("popstate", updateTypeFromUrl);
+
+    return () => window.removeEventListener("popstate", updateTypeFromUrl);
+  }, []);
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -24,15 +36,18 @@ export default function LoginPage() {
     }
   }, [isLoaded, user, router]);
 
+  if (!mounted) return null;
+
   const lines = [
     ["Welcome", "to", "Bankai."],
     ["Your", "personalized", "streaming", "experience", "starts", "here."],
-    ["Sign", "in", "or", "create", "an", "account", "to", "begin", "browsing."]
+    ["Sign", "in", "or", "create", "an", "account", "to", "begin", "browsing."],
   ];
 
-  if (!mounted) {
-    return null;
-  }
+  const changeType = (newType: "signin" | "signup") => {
+    router.push(`/login?t=${newType}`);
+    setType(newType);
+  };
 
   return (
     <>
@@ -49,11 +64,7 @@ export default function LoginPage() {
         }
       `}</style>
 
-      <div
-        className={`flex flex-col md:flex-row min-h-screen ${
-          resolvedTheme === "dark" ? "bg-black text-white" : "bg-white text-black"
-        } transition-colors duration-300`}
-      >
+      <div className="flex flex-col md:flex-row min-h-screen transition-colors duration-300">
         {/* Left side */}
         <div className="flex-1 flex flex-col justify-center px-6 md:px-12">
           <h1 className="text-3xl sm:text-4xl font-bold mb-4 leading-snug">
@@ -92,14 +103,14 @@ export default function LoginPage() {
 
           <div className="mt-6 flex gap-4">
             <Button
-              onClick={() => router.push("/login?t=signin")}
+              onClick={() => changeType("signin")}
               className="bg-purple-500 text-white hover:bg-purple-600"
             >
               Sign in
             </Button>
             <Button
               variant="outline"
-              onClick={() => router.push("/login?t=signup")}
+              onClick={() => changeType("signup")}
               className="text-purple-500 border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20"
             >
               Sign up
