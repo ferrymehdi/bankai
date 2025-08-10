@@ -79,7 +79,8 @@ export default function LoginPage() {
                         key={idx}
                         className={word === "Bankai." ? "text-purple-500" : ""}
                         style={{
-                          marginRight: idx !== line.length - 1 ? "0.25em" : undefined,
+                          marginRight:
+                            idx !== line.length - 1 ? "0.25em" : undefined,
                           display: "inline",
                           whiteSpace: "normal",
                           opacity: 0,
@@ -97,8 +98,8 @@ export default function LoginPage() {
           </h1>
 
           <p className="text-lg max-w-md opacity-80">
-            Unlimited access to our catalog. Create and manage watchlists.  
-            Get recommendations tailored for you.
+            Unlimited access to our catalog. Create and manage watchlists. Get
+            recommendations tailored for you.
           </p>
 
           <div className="mt-6 flex gap-4">
