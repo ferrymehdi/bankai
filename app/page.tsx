@@ -1,5 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
-import HomeClient from "./homeClient";
+import HomeClient from "./HomeClient";
 import jikan from "@/lib/jikan";
 
 export default async function Page() {
